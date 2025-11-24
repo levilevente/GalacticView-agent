@@ -58,7 +58,14 @@ You need Ollama installed and the Llama 3.1 model downloaded locally.
     poetry install
     ```
 
-3.  **Run the Agent**
+3.  **Set .env file**
+    ```bash
+    MODEL=llama3.1
+
+    ```
+    
+
+4.  **Run the Agent**
     Enter the Poetry shell or run the script directly.
     ```bash
     # Run the main entry point
