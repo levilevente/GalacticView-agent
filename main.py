@@ -1,6 +1,8 @@
+import json
 from langchain_ollama import ChatOllama
 from langchain_core.tools import tool
 from ddgs import DDGS 
+from langchain_core.messages import AIMessage
 
 from langchain.agents import create_agent
 from pydantic import BaseModel, Field
@@ -44,16 +46,24 @@ class ResponseStructure(BaseModel):
     content: str = Field(description="A detailed summary of the topic")
     images: list[dict[str, str]] = Field(description="A list of image results with URLs and titles")
 
+schema_str = json.dumps(ResponseStructure.model_json_schema(), indent=2)
+
 system_prompt = """
 You are a Senior Aerospace Engineer.
 Your goal is to provide accurate information about space.
 
 PROTOCOL:
-1. FIRST, use 'search_internet_for_text' to gather facts.
-2. SECOND, use 'search_internet_for_images' to find relevant visuals.
-3. FINALLY, compile all data into the Structured Output format.
+1. Call 'search_internet_for_text' to gather facts.
+2. Call 'search_internet_for_images' to find images.
+3. Finally, output a JSON object that strictly matches this schema:
 
-CRITICAL: You MUST return the result as a Structured Output. Do not just reply with text.
+{schema_str}
+
+CRITICAL RULES:
+- The keys MUST be exactly "title", "content", and "images".
+- Do NOT invent new keys like "name" or "description".
+- The "content" field must be a detailed summary of the text search results.
+- Output ONLY the JSON. No other text.
 """
 
 graph = create_agent(
@@ -61,20 +71,42 @@ graph = create_agent(
     tools=tools,
     response_format=ToolStrategy(ResponseStructure),
     system_prompt=system_prompt,
-    debug=True,
+    debug=False,
 )
 
 if __name__ == "__main__":
-    print("-" * 20)
-    question = input("Enter your space-related question: ")
-    print("-" * 20)
-    input = {"messages": [("user", question)]}
-    response = graph.invoke(input)
-    print("🪐 Final Structured Output:")
-    print(response["structured_response"])
+    while True:
+        question = input("Enter your space-related question (quit/exit to quit): ")
 
-    print("Title:", response["structured_response"].title)
-    print("Content:", response["structured_response"].content)
-    print("Images:")
-    for img in response["structured_response"].images:
-        print(f" - {img['title']}: {img['url']}")
+        if question.lower() in {"exit", "quit"}:
+            print("Exiting the program.")
+            break
+        
+        input_data = {"messages": [("user", question)]}
+        response = graph.invoke(input_data)
+
+        print("[DEBUG] Full Response Object:")
+        print(response)
+        
+        print("🪐 Final Structured Output:")
+
+        output_data = None
+        if "structured_response" not in response:
+            last_ai = next(m for m in reversed(response["messages"]) if isinstance(m, AIMessage))
+            content = last_ai.content
+            print("[DEBUG] Raw JSON Content:")
+            print(content)
+            output_data = json.loads(content)
+            print("Title:", output_data["title"])
+            print("Content:", output_data["content"])
+            print("Images:")
+            for img in output_data["images"]:
+                print(img)
+        else:
+            output_data = response["structured_response"]
+            print("Title:", output_data.title)
+            print("Content:", output_data.content)
+            print("Images:")
+            for img in output_data.images:
+                print(f" - {img['title']}: {img['url']}")
+
