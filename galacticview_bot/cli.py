@@ -1,11 +1,11 @@
 import json
 from langchain_ollama import ChatOllama
 from langchain_core.tools import tool
-from agents import space_agent_graph
+from galacticview_bot.agents import space_agent_graph
 from ddgs import DDGS 
 from langchain_core.messages import AIMessage
-from response_structure import TextAndImageStructure, TextResponseStructure
-from tools import search_internet_for_text, search_internet_for_images
+from galacticview_bot.response_structure import TextAndImageStructure, TextResponseStructure
+from galacticview_bot.tools import search_internet_for_text, search_internet_for_images
 
 
 from langchain.agents import create_agent, AgentState
@@ -17,24 +17,6 @@ model = ChatOllama(model="llama3.1", temperature=0, top_k=5, seed=42)
 tools = [search_internet_for_text, search_internet_for_images]
 
 schema_str = json.dumps(TextResponseStructure.model_json_schema(), indent=2)
-
-system_prompt = f"""
-You are a Senior Aerospace Engineer.
-
-PROTOCOL:
-1. Call 'search_internet_for_text' to gather facts.
-2. Call 'search_internet_for_images' to find images.
-3. Output a JSON object matching this schema:
-
-{schema_str}
-
-CRITICAL RULES:
-- The 'content' must ANSWER THE USER'S QUESTION. 
-- Do not just summarize the search results if they are irrelevant to the specific question.
-- If the search results are bad (e.g., discussing distance instead of star count), use your INTERNAL KNOWLEDGE to correct it.
-- The keys MUST be exactly "title", "content", and "images".
-- Output ONLY the JSON.
-"""
 
 
 system_prompt_2 = """
