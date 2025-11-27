@@ -12,4 +12,3 @@ class TextResponseStructure(BaseModel):
 
 class ImageResponseStructure(BaseModel):
     images: list[dict[str, str]] = Field(description="A list of image results with URLs and titles")
-

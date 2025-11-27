@@ -1,25 +1,25 @@
-import json
-from langchain_ollama import ChatOllama
-from langchain_core.tools import tool
-from galacticview_bot.agents import space_agent_graph
-from ddgs import DDGS 
+from agents import space_agent_graph
 from langchain_core.messages import AIMessage
-from galacticview_bot.response_structure import TextAndImageStructure, TextResponseStructure
-from galacticview_bot.tools import search_internet_for_text, search_internet_for_images
+from response_structure import TextResponseStructure
+from tools import search_internet_for_text, search_internet_for_images
+from langchain_ollama import ChatOllama
+import json
 
+import os
+from dotenv import load_dotenv
 
-from langchain.agents import create_agent, AgentState
-from pydantic import BaseModel, Field
-from langchain.agents.structured_output import ToolStrategy
+load_dotenv()
 
-model = ChatOllama(model="llama3.1", temperature=0, top_k=5, seed=42)
+MODEL_NAME = os.getenv('MODEL_NAME', 'llama3.1')
+
+model = ChatOllama(model=MODEL_NAME, temperature=0, top_k=20, seed=42)
 
 tools = [search_internet_for_text, search_internet_for_images]
 
 schema_str = json.dumps(TextResponseStructure.model_json_schema(), indent=2)
 
 
-system_prompt_2 = """
+system_prompt = f"""
 You are a Senior Aerospace Engineer.
 
 PROTOCOL:
@@ -36,7 +36,7 @@ CRITICAL RULES:
 - Output ONLY the JSON.
 """
 
-graph = space_agent_graph(model, tools, system_prompt_2, TextResponseStructure)
+graph = space_agent_graph(model, tools, system_prompt, TextResponseStructure)
 
 if __name__ == "__main__":
     while True:
@@ -56,11 +56,19 @@ if __name__ == "__main__":
 
         output_data = None
         if "structured_response" not in response:
-            last_ai = next(m for m in reversed(response["messages"]) if isinstance(m, AIMessage))
+            try:
+                last_ai = next(m for m in reversed(response["messages"]) if isinstance(m, AIMessage))
+            except StopIteration:
+                print("Error: No AI response found in messages")
+                continue
             content = last_ai.content
             print("[DEBUG] Raw JSON Content:")
             print(content)
-            output_data = json.loads(content)
+            try:
+                output_data = json.loads(content)
+            except json.JSONDecodeError as e:
+                print(f"Error: Failed to parse JSON response: {e}")
+                continue
             print("Title:", output_data["title"])
             print("Content:", output_data["content"])
             if "images" in output_data:
@@ -75,4 +83,3 @@ if __name__ == "__main__":
                 print("Images:")
                 for img in output_data.images:
                     print(f" - {img['title']}: {img['url']}")
-            

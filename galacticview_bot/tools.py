@@ -14,9 +14,8 @@ def search_internet_for_text(query: str):
             summary = " ".join([result.get("body", "") for result in results])
             return summary
     except Exception as e:
-        print(f"Error detail: {e}")
-        return f"Error searching text: {e}"    
-    
+        print(f"[DEBUG] Error detail: {e}")
+        return "Error searching for text. Please try again."
 @tool
 def search_internet_for_images(query: str):
     """Searches the internet for images. Returns a list of image URLs."""
@@ -29,6 +28,6 @@ def search_internet_for_images(query: str):
             return "No image results found."
         return results
     except Exception as e:
-        print(f"Error detail: {e}")
-        return f"Error searching images: {e}"
+        print(f"[DEBUG] Error detail: {e}")
+        return "Error searching for images. Please try again."
     
