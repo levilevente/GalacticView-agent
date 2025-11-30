@@ -1,7 +1,10 @@
-from agents import space_agent_graph
+from .agents import space_agent_graph
 from langchain_core.messages import AIMessage
-from response_structure import TextResponseStructure
-from tools import search_internet_for_text, search_internet_for_images
+from .response_structure import TextResponseStructure
+from .tools import (
+    search_internet_for_text,
+    search_internet_for_images,
+)
 from langchain_ollama import ChatOllama
 import json
 
