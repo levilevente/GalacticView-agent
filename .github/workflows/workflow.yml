@@ -70,7 +70,7 @@ jobs:
     # - a push to the `main` branch occurs, OR
     # - a PR targets `main`, OR
     # - the workflow is manually triggered via `workflow_dispatch`.
-    if: ${{ github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && github.ref == 'refs/heads/main') }}
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event_name == 'push' || github.event_name == 'pull_request' }}
     runs-on: ubuntu-latest
     needs: lint
     strategy:
