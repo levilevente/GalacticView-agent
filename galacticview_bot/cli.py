@@ -1,10 +1,7 @@
 from .agents import space_agent_graph
 from langchain_core.messages import AIMessage
 from .response_structure import TextResponseStructure
-from .tools import (
-    search_internet_for_text,
-    search_internet_for_images,
-)
+from .search import tavily_search_tool
 from langchain_ollama import ChatOllama
 import json
 
@@ -15,9 +12,9 @@ load_dotenv()
 
 MODEL_NAME = os.getenv("MODEL_NAME", "llama3.1")
 
-model = ChatOllama(model=MODEL_NAME, temperature=0, top_k=20, seed=42)
+model = ChatOllama(model=MODEL_NAME, temperature=0, top_k=20, seed=42, num_ctx=8192,)
 
-tools = [search_internet_for_text, search_internet_for_images]
+tools = [tavily_search_tool]
 
 schema_str = json.dumps(TextResponseStructure.model_json_schema(), indent=2)
 
