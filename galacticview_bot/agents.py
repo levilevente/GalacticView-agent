@@ -2,7 +2,7 @@ from typing import TypedDict, Annotated, List
 
 import json
 
-from langchain_core.messages import BaseMessage, ToolMessage, HumanMessage, SystemMessage, AIMessage
+from langchain_core.messages import BaseMessage, ToolMessage, HumanMessage, SystemMessage
 from langgraph.graph import StateGraph, END
 from langgraph.graph.message import add_messages
 
@@ -10,13 +10,9 @@ from .model import llm
 from .search import tavily_search_tool
 from .response_structure import SpaceResponseStructure
 
-
-
-
 tools = [tavily_search_tool]
+
 llm_with_tools = llm.bind_tools(tools)
-
-
 
 class AgentState(TypedDict):
     messages: Annotated[List[BaseMessage], add_messages]    
@@ -37,13 +33,10 @@ def custom_tool_node(state: AgentState) -> AgentState:
     message = state["messages"]
     last_message = message[-1]
 
-    if isinstance(last_message, ToolMessage):
-        tool_calls = last_message.tool_calls # type: ignore
-    else:
-        tool_calls = getattr(last_message, "tool_calls", None) or []
-
+    tool_calls = getattr(last_message, "tool_calls", [])
+    
     if not tool_calls:
-        return state  # No tool calls to process
+        return {"messages": []}
     
     tool_map = {tool.name: tool for tool in tools}
 
@@ -54,7 +47,7 @@ def custom_tool_node(state: AgentState) -> AgentState:
         tool_args = tool_call['args']
         tool_call_id = tool_call['id']
 
-        print(f"  🛠️ Executing Custom Tool: {tool_name} with args: {tool_args}")
+        print(f"Executing Custom Tool: {tool_name} with args: {tool_args}")
 
         if tool_name in tool_map:
             
@@ -65,15 +58,15 @@ def custom_tool_node(state: AgentState) -> AgentState:
                 raw_output = chosen_tool.invoke(tool_args)
 
                 if not raw_output:
-                    print(f"  ⚠️ WARNING: Tool returned EMPTY result for query: {tool_args.get('query')}")
+                    print(f"WARNING: Tool returned EMPTY result for query: {tool_args.get('query')}")
                     clean_content = "Search returned no results. Try a broader query without filters."
                 else:
-                    print(f"  ✅ Tool returned data (Length: {len(str(raw_output))})")
+                    print(f"Tool returned data (Length: {len(str(raw_output))})")
                     clean_content = json.dumps(raw_output) if isinstance(raw_output, (dict, list)) else str(raw_output) 
             except Exception as e:
                 clean_content = f"Error executing tool {tool_name}: {e}"
         else:
-            print(f"  ⚠️ Tool {tool_name} not found.")
+            print(f"Tool {tool_name} not found.")
             clean_content = f"Error: Tool {tool_name} not found."
         
         results.append(ToolMessage(
@@ -82,7 +75,7 @@ def custom_tool_node(state: AgentState) -> AgentState:
             name=tool_name
         ))
 
-    return {"messages": results}
+    return {"messages": results} # type: ignore
 
 
 def reasoner(state: AgentState) -> AgentState:
@@ -136,22 +129,18 @@ def should_continue(state: AgentState) -> str:
     messages = state["messages"]
     last_message = messages[-1]
 
-    # If the LLM wants to use a tool
-    if last_message.tool_calls:
-        # 1. ROBUST COUNTING: Check the 'type' string, not the class
-        ai_moves = len([m for m in messages if m.type == "ai"])
-        
-        # 2. DEBUG PRINT: See exactly what the agent is thinking
-        print(f"  👀 Watchdog: AI has made {ai_moves}/5 moves...")
+    
+    tool_calls = getattr(last_message, "tool_calls", [])
+    
+    if not tool_calls:
+        return "formatter"
+    ai_moves = len([m for m in messages if m.type == "ai"])
 
-        if ai_moves >= 5:
-            print("  🛑 STOP: Maximum reasoning steps reached. Forcing format.")
-            return "formatter"
-        
-        return "tools"
-
-    return "formatter"
-
+    if ai_moves >= 5:
+        print("STOP: Maximum reasoning steps reached. Forcing format.")
+        return "formatter"
+    
+    return "tools"
 
 # Agent graph
 workflow = StateGraph(AgentState)

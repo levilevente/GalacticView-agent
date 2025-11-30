@@ -6,7 +6,7 @@ from ddgs import DDGS
 def search_internet_for_text(query: str) -> str:
     """Searches the internet for real-time information."""
 
-    print(f"  🔎 Searching text for: {query}")
+    print(f"Searching text for: {query}")
     try:
         with DDGS() as ddgs:
             results = ddgs.text(query, max_results=5)
@@ -23,7 +23,7 @@ def search_internet_for_text(query: str) -> str:
 def search_internet_for_images(query: str) -> list[dict[str, str]]:
     """Searches the internet for images. Returns a list of image URLs."""
 
-    print(f"  📸 Searching images for: {query}")
+    print(f"Searching images for: {query}")
     try:
         with DDGS() as ddgs:
             results = ddgs.images(query, max_results=4)
