@@ -71,8 +71,17 @@ if __name__ == "__main__":
             content = last_ai.content
             print("[DEBUG] Raw JSON Content:")
             print(content)
+            # normalize message content to a JSON string before parsing. Some tool
+            # messages may return lists/dicts directly which would make the type
+            # of `content` be `str | list | dict` — ensure we pass a string to
+            # `json.loads` to satisfy type checkers and runtime behavior.
+            if isinstance(content, (list, dict)):
+                content_str = json.dumps(content)
+            else:
+                content_str = str(content)
+
             try:
-                output_data = json.loads(content)
+                output_data = json.loads(content_str)
             except json.JSONDecodeError as e:
                 print(f"Error: Failed to parse JSON response: {e}")
                 continue
