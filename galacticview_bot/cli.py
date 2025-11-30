@@ -7,18 +7,18 @@ from .agents import app
 def main() -> int:
     print("Aerospace Agent Online (Tavily + LangGraph)")
 
-    # Example prompt for a quick smoke run; in interactive mode you'll want to
+    # example prompt for a quick smoke run; in interactive mode you'll want to
     # replace this with user input or an API endpoint.
     user_q = "What is the latest news about the Artemis mission?"
 
-    # Initial System Prompt to set persona
+    # initial System Prompt to set persona
     sys_msg = SystemMessage(
         content="You are a friendly and knowledgeable space enthusiast. Provide detailed and accurate information about space-related topics, including key metrics where applicable."
         )
 
     inputs = {"messages": [sys_msg, HumanMessage(content=user_q)]}
 
-    # Stream events to see it thinking
+    # stream events to see it thinking
     try:
         thread_id =  "aerospace-agent-thread-001"
 
@@ -30,7 +30,7 @@ def main() -> int:
         for event in app.stream(inputs, config=config): # type: ignore
             for key, value in event.items():
                 print(f"\n--- Node: {key} ---")
-                # In the formatter node, we can grab the final JSON
+                # in the formatter node, we can grab the final JSON
                 if key == "formatter":
                     raw_json = value["messages"][0].content
                     data = json.loads(raw_json)

@@ -1,7 +1,6 @@
 from pydantic import BaseModel, Field
 from typing import List
 
-
 class TextAndImageStructure(BaseModel):
     title: str = Field(description="A catchy title for the topic")
     content: str = Field(description="A detailed summary of the topic")

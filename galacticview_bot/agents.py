@@ -160,7 +160,7 @@ workflow.add_conditional_edges(
     },
 )
 
-workflow.add_edge("tools", "agent") # Loop back to agent after using tool
+workflow.add_edge("tools", "agent") # loop back to agent after using tool
 workflow.add_edge("formatter", END)
 
 
