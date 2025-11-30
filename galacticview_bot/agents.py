@@ -5,7 +5,7 @@ from langchain.agents.structured_output import ToolStrategy
 
 
 class CustomState(AgentState):
-    user_preferences: dict
+    user_preferences: dict[str, Any]
 
 
 def space_agent_graph(
