@@ -15,14 +15,22 @@ dependencies = [
     "langgraph (>=1.0.3,<2.0.0)",
     "ddgs (>=9.9.1,<10.0.0)",
 ]
-packages = [{include = "galacticview_bot"}]
 
 [build-system]
 requires = ["poetry-core>=2.0.0,<3.0.0"]
 build-backend = "poetry.core.masonry.api"
 
+[tool.poetry]
+# Include the main package
+packages = [
+    { include = "galacticview_bot" }
+]
+
+[project.scripts]
+# Optional console script to run the CLI: `poetry run galacticview`
+galacticview = "galacticview_bot.cli:main"
+
 [tool.ruff]
-# select ruff.toml settings
 
 
 [tool.mypy]

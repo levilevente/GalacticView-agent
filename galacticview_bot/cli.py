@@ -41,7 +41,9 @@ CRITICAL RULES:
 
 graph = space_agent_graph(model, tools, system_prompt, TextResponseStructure)
 
-if __name__ == "__main__":
+
+def main() -> None:
+    """Start interactive CLI loop for querying the space agent."""
     while True:
         question = input("Enter your space-related question (quit/exit to quit): ")
 
@@ -102,3 +104,7 @@ if __name__ == "__main__":
                 print("Images:")
                 for img in output_data.images:
                     print(f" - {img['title']}: {img['url']}")
+
+
+if __name__ == "__main__":
+    main()
