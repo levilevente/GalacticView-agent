@@ -39,3 +39,9 @@ dev = [
     "types-requests (>=2.32.4.20250913,<3.0.0.0)",
     "types-urllib3 (>=1.26.25.14,<2.0.0.0)"
 ]
+
+[tool.poetry]
+name = "galacticview-agent"
+version = "0.1.0"
+description = "..."
+packages = [{include = "galacticview_bot"}]
