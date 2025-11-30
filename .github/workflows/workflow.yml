@@ -41,7 +41,9 @@ jobs:
       - name: Install dependencies (including dev)
         run: |
           poetry config virtualenvs.create false
-          # Install regular + dev dependencies (requires Poetry 1.9.0+)
+          # With PEP 735 dependency-groups, dev dependencies are installed by
+          # default by `poetry install`. Use the plain install command so this
+          # workflow works regardless of Poetry version.
           poetry install --no-interaction
 
       - name: Lint with ruff
