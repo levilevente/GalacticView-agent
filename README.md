@@ -1,46 +1,45 @@
 # 🤖 GalacticView AI Agent
 
-![Python](https://img.shields.io/badge/Python-3.10%2B-blue?style=for-the-badge&logo=python&logoColor=white)
+![Python](https://img.shields.io/badge/Python-3.12%2B-blue?style=for-the-badge&logo=python&logoColor=white)
 ![Poetry](https://img.shields.io/badge/Poetry-Package%20Manager-blueviolet?style=for-the-badge&logo=poetry&logoColor=white)
-![Ollama](https://img.shields.io/badge/Ollama-Local%20LLM-black?style=for-the-badge)
-![Model](https://img.shields.io/badge/Llama-3.1-orange?style=for-the-badge)
+![Groq](https://img.shields.io/badge/Groq-Fast%20Inference-f55036?style=for-the-badge)
+![LangGraph](https://img.shields.io/badge/LangGraph-Agent%20Orchestration-1c2c4c?style=for-the-badge)
+![Tavily](https://img.shields.io/badge/Tavily-Search%20Tool-000000?style=for-the-badge)
 
-> A specialized AI service powered by **Llama 3.1** and **Ollama**. Designed to answer astronomy-related questions and serve as the intelligent backend for the [GalacticView](https://github.com/[YOUR_USERNAME]/GalacticView) web application.
+> A specialized AI service powered by **Groq** (Llama 3.1) and **LangGraph**. Designed to answer astronomy-related questions with real-time web search capabilities using **Tavily**.
 
 ---
 
 ## 📖 Overview
 
-This repository houses the backend logic for the GalacticView AI assistant. It utilizes the **Llama 3.1** Large Language Model (running locally via Ollama) to process natural language queries about space, galaxies, stars, and NASA data.
+This repository houses the intelligent backend for the [GalacticView](https://github.com/levilevente/GalacticView) ecosystem. 
 
-The goal is to provide context-aware, scientific, and engaging answers to users exploring the GalacticView dashboard.
+Unlike standard chatbots, this agent is built using **LangGraph**, allowing it to perform complex reasoning loops. It leverages **Groq** for ultra-fast Llama 3.1 inference and utilizes **Tavily** to search the internet for real-time astronomical data and news, ensuring answers are not limited to the model's training cutoff.
 
 ### 🛠 Tech Stack
 
 * **Language:** Python
+* **Orchestration:** LangGraph (LangChain)
+* **Inference Engine:** Groq API
+* **Model:** Llama 3.1 (via Groq)
+* **Tools:** Tavily Search API
 * **Dependency Management:** Poetry
-* **Inference Engine:** Ollama (Local)
-* **Model:** Llama 3.1
 
 ---
 
 ## ⚙️ Prerequisites & Setup
 
-Before running the agent, ensure you have the following installed on your machine.
+Before running the agent, ensure you have the necessary tools and API keys.
 
 ### 1. Install System Tools
-* **Python:** Version >=3.12, <3.14, 
+* **Python:** Version >=3.12, <3.14
 * **Poetry:** [Installation Guide](https://python-poetry.org/docs/#installation).
 
-### 2. Setup Ollama (The Brain)
-You need Ollama installed and the Llama 3.1 model downloaded locally.
+### 2. Obtain API Keys
+Since this agent runs on the cloud, you need keys for the inference engine and the search tool:
 
-1.  **Install Ollama:**
-2.  **Pull the Model:**
-    ```bash
-    ollama pull llama3.1
-    ```
-3.  **Start the Server:** Ensure Ollama is running in the background (usually on port `11434`).
+* **Groq API Key:** Sign up at [console.groq.com](https://console.groq.com) to use Llama 3.1.
+* **Tavily API Key:** Sign up at [tavily.com](https://tavily.com) to enable internet search capabilities.
 
 ---
 
@@ -48,7 +47,7 @@ You need Ollama installed and the Llama 3.1 model downloaded locally.
 
 1.  **Clone the Repository**
     ```bash
-    git clone https://github.com/levilevente/GalacticView-agent.git
+    git clone [https://github.com/levilevente/GalacticView-agent.git](https://github.com/levilevente/GalacticView-agent.git)
     cd GalacticView-agent
     ```
 
@@ -58,39 +57,57 @@ You need Ollama installed and the Llama 3.1 model downloaded locally.
     poetry install
     ```
 
-3.  **Set .env file**
+3.  **Configure Environment Variables**
+    Create a `.env` file in the root directory and add your keys:
     ```bash
-    MODEL=llama3.1
-
+    # .env file content
+    GROQ_API_KEY=gsk_your_groq_key_here
+    TAVILY_API_KEY=tvly-your_tavily_key_here
+    MODEL=llama-3.1
     ```
-    
 
 4.  **Run the Agent**
     Enter the Poetry shell or run the script directly.
     ```bash
     # Run the main entry point
-    poetry run python main.py
+    poetry run galacticview
     ```
 
 ---
 
 ## 🧪 Example Usage
 
-Once the script is running, the agent allows for Q&A interaction.
+Once running, the agent can answer static questions or perform research.
 
 **Input:**
-> "What is the difference between a Red Giant and a White Dwarf?"
+> "What is the latest news about the Artemis mission?"
 
-**Agent Response (Llama 3.1):**
-> "A Red Giant is a dying star in the final stages of stellar evolution... whereas a White Dwarf is what remains of a star like our Sun after it has exhausted its nuclear fuel..."
+**Agent Logic:**
+1.  *LangGraph* detects the need for recent information.
+2.  Calls *Tavily* to search the web for "latest Artemis mission updates".
+3.  *Groq (Llama 3.1)* synthesizes the search results.
+
+**Agent Response:**
+```json
+{
+  "title": "Artemis Mission",
+  "content": "The Artemis mission is a NASA program aimed at returning humans to the moon by 2027.",
+  "key_metrics": [
+    "Mission Date: February 2026",
+    "Next Lunar Landing: 2027",
+    "Program Delayed Several Times"
+  ]
+}
+```
+
 
 ---
 
 ## 🔗 Integration Roadmap
 
 This agent is designed to connect with the **GalacticView Frontend**.
-* **Current Status:** Standalone CLI / Python Script.
-* **Next Steps:** Wrap the agent in a REST API (FastAPI/Flask) to allow the React frontend to send requests and receive answers via HTTP.
+* **Current Status:** CLI-based Agent with Search Tools.
+* **Next Steps:** Wrap the LangGraph workflow in a REST API (FastAPI) to allow the React frontend to send requests and receive streaming answers.
 
 ---
 
