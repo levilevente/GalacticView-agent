@@ -10,7 +10,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-MODEL_NAME = os.getenv('MODEL_NAME', 'llama3.1')
+MODEL_NAME = os.getenv("MODEL_NAME", "llama3.1")
 
 model = ChatOllama(model=MODEL_NAME, temperature=0, top_k=20, seed=42)
 
@@ -45,19 +45,26 @@ if __name__ == "__main__":
         if question.lower() in {"exit", "quit"}:
             print("Exiting the program.")
             break
-        
-        input_data = {"messages": [("user", question)], "user_preferences": {"style": "technical", "verbosity": "detailed"}}
+
+        input_data = {
+            "messages": [("user", question)],
+            "user_preferences": {"style": "technical", "verbosity": "detailed"},
+        }
         response = graph.invoke(input_data)
 
         print("[DEBUG] Full Response Object:")
         print(response)
-        
+
         print("🪐 Final Structured Output:")
 
         output_data = None
         if "structured_response" not in response:
             try:
-                last_ai = next(m for m in reversed(response["messages"]) if isinstance(m, AIMessage))
+                last_ai = next(
+                    m
+                    for m in reversed(response["messages"])
+                    if isinstance(m, AIMessage)
+                )
             except StopIteration:
                 print("Error: No AI response found in messages")
                 continue
@@ -79,7 +86,7 @@ if __name__ == "__main__":
             output_data = response["structured_response"]
             print("Title:", output_data.title)
             print("Content:", output_data.content)
-            if hasattr(output_data, 'images'):
+            if hasattr(output_data, "images"):
                 print("Images:")
                 for img in output_data.images:
                     print(f" - {img['title']}: {img['url']}")

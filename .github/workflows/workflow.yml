@@ -1,0 +1,54 @@
+name: CI
+
+on:
+  push:
+    branches: [ main, feature/** ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.12]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install Poetry
+        run: |
+          python -m pip install --upgrade pip
+          pip install poetry
+
+      - name: Cache Poetry cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cache/pypoetry
+            ~/.cache/pip
+          key: ${{ runner.os }}-poetry-${{ hashFiles('**/poetry.lock') }}
+
+      - name: Install dependencies (including dev)
+        run: |
+          poetry config virtualenvs.create false
+          # Install regular + dev dependencies (requires Poetry 1.2+)
+          poetry install --no-interaction --with dev
+
+      - name: Lint with ruff
+        run: |
+          poetry run ruff check .
+
+      - name: Type check with mypy
+        run: |
+          poetry run mypy .
+
+      - name: Show Python packages
+        run: python -m pip list

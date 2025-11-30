@@ -1,6 +1,7 @@
 from langchain_core.tools import tool
 from ddgs import DDGS
 
+
 @tool
 def search_internet_for_text(query: str):
     """Searches the internet for real-time information."""
@@ -16,6 +17,8 @@ def search_internet_for_text(query: str):
     except Exception as e:
         print(f"[DEBUG] Error detail: {e}")
         return "Error searching for text. Please try again."
+
+
 @tool
 def search_internet_for_images(query: str):
     """Searches the internet for images. Returns a list of image URLs."""
@@ -30,4 +33,3 @@ def search_internet_for_images(query: str):
     except Exception as e:
         print(f"[DEBUG] Error detail: {e}")
         return "Error searching for images. Please try again."
-    
