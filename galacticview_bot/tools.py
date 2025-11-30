@@ -3,7 +3,7 @@ from ddgs import DDGS
 
 
 @tool
-def search_internet_for_text(query: str):
+def search_internet_for_text(query: str) -> str:
     """Searches the internet for real-time information."""
 
     print(f"  🔎 Searching text for: {query}")
@@ -20,7 +20,7 @@ def search_internet_for_text(query: str):
 
 
 @tool
-def search_internet_for_images(query: str):
+def search_internet_for_images(query: str) -> list[dict[str, str]]:
     """Searches the internet for images. Returns a list of image URLs."""
 
     print(f"  📸 Searching images for: {query}")
@@ -28,8 +28,8 @@ def search_internet_for_images(query: str):
         with DDGS() as ddgs:
             results = ddgs.images(query, max_results=4)
         if not results:
-            return "No image results found."
+            return []
         return results
     except Exception as e:
         print(f"[DEBUG] Error detail: {e}")
-        return "Error searching for images. Please try again."
+        return []

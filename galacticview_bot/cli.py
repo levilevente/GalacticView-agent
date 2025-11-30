@@ -4,16 +4,11 @@ from langchain_core.messages import SystemMessage, HumanMessage
 from .agents import app
 
 def main() -> int:
-    import uuid
-
-    thread_id = str(uuid.uuid4())
-    config = {"configurable": {"thread_id": thread_id}}
-
     print("🚀 Aerospace Agent Online (Tavily + LangGraph)")
 
     # Example prompt for a quick smoke run; in interactive mode you'll want to
     # replace this with user input or an API endpoint.
-    user_q = "How many moons have Saturn? Provide technical details and key metrics about the largest moons."
+    user_q = "How many moons have Saturn?"
 
     # Initial System Prompt to set persona
     sys_msg = SystemMessage(content="You are a friendly and knowledgeable space enthusiast. Provide detailed and accurate information about space-related topics, including key metrics where applicable.")
@@ -22,7 +17,7 @@ def main() -> int:
 
     # Stream events to see it thinking
     try:
-        for event in app.stream(inputs):
+        for event in app.stream(inputs): # type: ignore
             for key, value in event.items():
                 print(f"\n--- Node: {key} ---")
                 # In the formatter node, we can grab the final JSON

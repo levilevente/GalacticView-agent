@@ -2,8 +2,7 @@ from typing import TypedDict, Annotated, List
 
 import json
 
-from langgraph.prebuilt import ToolNode
-from langchain_core.messages import BaseMessage, SystemMessage, HumanMessage
+from langchain_core.messages import BaseMessage, ToolMessage, HumanMessage, SystemMessage
 from langgraph.graph import StateGraph, END
 
 from .model import llm
@@ -22,16 +21,63 @@ class AgentState(TypedDict):
 
 # Node functions
 
-"""
-Input: The State (specifically looking for the last message with a tool_calls request).
+def custom_tool_node(state: AgentState) -> AgentState:
+    """
+    A tool node that executes the requested tool calls.
 
-Action: It sees the Agent asked for a search. It actually calls the Tavily API.
+    Input: The State (specifically looking for the last message with a tool_calls request).
 
-Output: It returns a ToolMessage containing the raw text found on the internet.
-"""
-tool_node = ToolNode(tools)
+    Action: It sees the Agent asked for a search. It actually calls the Tavily API.
 
-def reasoner(state: AgentState):
+    Output: It returns a ToolMessage containing the raw text found on the internet.
+    """
+
+    message = state["messages"]
+    last_message = message[-1]
+
+    if isinstance(last_message, ToolMessage):
+        tool_calls = last_message.tool_calls # type: ignore
+    else:
+        tool_calls = getattr(last_message, "tool_calls", None) or []
+
+    if not tool_calls:
+        return state  # No tool calls to process
+    
+    tool_map = {tool.name: tool for tool in tools}
+
+    results = []
+
+    for tool_call in tool_calls:
+        tool_name = tool_call['name']
+        tool_args = tool_call['args']
+        tool_call_id = tool_call['id']
+
+        print(f"  🛠️ Executing Custom Tool: {tool_name} with args: {tool_args}")
+
+        if tool_name in tool_map:
+            chosen_tool = tool_map[tool_name]
+
+            raw_output = chosen_tool.invoke(tool_args)
+
+            try:
+                clean_content = json.dumps(raw_output, default=str)
+            except Exception as e:
+                clean_content = f"Error executing tool {tool_name}: {e}"
+        else:
+            print(f"  ⚠️ Tool {tool_name} not found.")
+            clean_content = f"Error: Tool {tool_name} not found."
+        
+        results.append(ToolMessage(
+            tool_call_id=tool_call_id,
+            content=str(clean_content),
+            name=tool_name
+        ))
+
+    return {"messages": state["messages"] + results} # type: ignore
+
+
+
+def reasoner(state: AgentState) -> AgentState:
     """
     The brain. Decides whether to search or answer.
 
@@ -48,7 +94,7 @@ def reasoner(state: AgentState):
     return {"messages": [response]}
 
 
-def formatter(state: AgentState):
+def formatter(state: AgentState) -> AgentState:
     """
     Takes the final raw text conversation and forces it into the JSON schema.
 
@@ -67,32 +113,31 @@ def formatter(state: AgentState):
     ]
     
     # force structured output
-    structured_llm = llm.with_structured_output(SpaceResponseStructure)
+    structured_llm = llm.with_structured_output(SpaceResponseStructure.model_json_schema())
     response = structured_llm.invoke(formatter_prompt)
     
-    return {"messages": [HumanMessage(content=json.dumps(response.dict()))]}
+    return {"messages": [HumanMessage(content=json.dumps(response))]}
 
 
 # Edge conditions
 
-def should_continue(state: AgentState):
+def should_continue(state: AgentState) -> str:
     """
     Conditional logic: If tool calls exist, go to tools. Else, format output.
     """
     last_message = state["messages"][-1]
 
-    # check if the last message has tool calls
-    if last_message.tool_calls:
-        return "tools" # go to tool node
+    tool_calls = getattr(last_message, "tool_calls", None)
+    if tool_calls:
+        return "tools"  # go to tool node
     return "formatter" # go to formatter
-
 
 
 # Agent graph
 workflow = StateGraph(AgentState)
 
 workflow.add_node("agent", reasoner)
-workflow.add_node("tools", tool_node)
+workflow.add_node("tools", custom_tool_node)
 workflow.add_node("formatter", formatter)
 
 workflow.set_entry_point("agent")
