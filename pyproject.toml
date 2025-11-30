@@ -16,7 +16,36 @@ dependencies = [
     "ddgs (>=9.9.1,<10.0.0)",
 ]
 
+[project.scripts]
+# Optional console script to run the CLI: `poetry run galacticview`
+galacticview = "galacticview_bot.cli:main"
+
 
 [build-system]
 requires = ["poetry-core>=2.0.0,<3.0.0"]
 build-backend = "poetry.core.masonry.api"
+
+
+[tool.poetry]
+# Include the main package
+packages = [
+    { include = "galacticview_bot" }
+]
+
+
+[tool.mypy]
+python_version = "3.12"
+check_untyped_defs = true
+disallow_untyped_defs = true
+warn_unused_ignores = true
+exclude = ["tests/.*", "bin/.*"]
+
+
+[project.optional-dependencies]
+dev = [
+    "ruff (>=0.14.7,<0.15.0)",
+    "mypy (>=1.19.0,<2.0.0)",
+    "pytest (>=9.0.1,<10.0.0)",
+    "types-requests (>=2.32.4.20250913,<3.0.0.0)",
+    "types-urllib3 (>=1.26.25.14,<2.0.0.0)"
+]
