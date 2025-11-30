@@ -46,6 +46,13 @@ jobs:
           # workflow works regardless of Poetry version.
           poetry install --no-interaction
 
+      - name: Ensure linters are available (fallback)
+        run: |
+          # Some Poetry setups in CI may not expose console scripts as expected.
+          # Install ruff and mypy directly as a fallback so the commands exist.
+          python -m pip install --upgrade pip
+          python -m pip install ruff mypy
+
       - name: Lint with ruff
         run: |
           poetry run ruff check .
