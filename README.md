@@ -63,8 +63,11 @@ Since this agent runs on the cloud, you need keys for the inference engine and t
     # .env file content
     GROQ_API_KEY=gsk_your_groq_key_here
     TAVILY_API_KEY=tvly-your_tavily_key_here
-    MODEL=llama-3.1
+    MODEL_NAME=llama-3.1
+    LLM_LOCAL=False #LLM_LOCAL=True in case you have a local llama3.1 running.
     ```
+
+    
 
 4.  **Run the Agent**
     Enter the Poetry shell or run the script directly.
@@ -90,13 +93,12 @@ Once running, the agent can answer static questions or perform research.
 **Agent Response:**
 ```json
 {
-  "title": "Artemis Mission",
-  "content": "The Artemis mission is a NASA program aimed at returning humans to the moon by 2027.",
+  "content": "The Artemis mission has been delayed due to damage found to the heat shield of the uncrewed Orion capsule. Artemis 2 remains on track for late 2024, but Artemis 3 has been pushed back to mid-2027.",
   "key_metrics": [
-    "Mission Date: February 2026",
-    "Next Lunar Landing: 2027",
-    "Program Delayed Several Times"
-  ]
+    "Artemis 2: late 2024",
+    "Artemis 3: mid-2027"
+  ],
+  "title": "Artemis Mission Delay"
 }
 ```
 

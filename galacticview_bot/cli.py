@@ -1,6 +1,8 @@
-
 import json
+import datetime
+
 from langchain_core.messages import SystemMessage, HumanMessage
+
 from .agents import app
 
 def main() -> int:
@@ -11,13 +13,22 @@ def main() -> int:
     user_q = "What is the latest news about the Artemis mission?"
 
     # Initial System Prompt to set persona
-    sys_msg = SystemMessage(content="You are a friendly and knowledgeable space enthusiast. Provide detailed and accurate information about space-related topics, including key metrics where applicable.")
+    sys_msg = SystemMessage(
+        content="You are a friendly and knowledgeable space enthusiast. Provide detailed and accurate information about space-related topics, including key metrics where applicable."
+        )
 
     inputs = {"messages": [sys_msg, HumanMessage(content=user_q)]}
 
     # Stream events to see it thinking
     try:
-        for event in app.stream(inputs): # type: ignore
+        thread_id =  "aerospace-agent-thread-001"
+
+        config = {
+            "configurable": {"thread_id": thread_id},
+            "recursion_limit": 50 
+        }
+
+        for event in app.stream(inputs, config=config):
             for key, value in event.items():
                 print(f"\n--- Node: {key} ---")
                 # In the formatter node, we can grab the final JSON
