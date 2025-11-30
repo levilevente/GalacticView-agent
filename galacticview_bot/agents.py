@@ -75,6 +75,7 @@ def custom_tool_node(state: AgentState) -> AgentState:
             name=tool_name
         ))
 
+    # unnecessary suppression of type checker here
     return {"messages": results} # type: ignore
 
 
@@ -114,8 +115,8 @@ def formatter(state: AgentState) -> AgentState:
     ]
     
     # force structured output
-    structured_llm = llm.with_structured_output(SpaceResponseStructure.model_json_schema())
-    response = structured_llm.invoke(formatter_prompt)
+    schema_constrained_llm = llm.with_structured_output(SpaceResponseStructure.model_json_schema())
+    response = schema_constrained_llm.invoke(formatter_prompt)
     
     return {"messages": [HumanMessage(content=json.dumps(response))]}
 

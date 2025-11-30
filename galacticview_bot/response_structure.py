@@ -1,5 +1,4 @@
 from pydantic import BaseModel, Field
-from typing import List
 
 class TextAndImageStructure(BaseModel):
     title: str = Field(description="A catchy title for the topic")
@@ -22,4 +21,4 @@ class ImageResponseStructure(BaseModel):
 class SpaceResponseStructure(BaseModel):
     title: str = Field(description="Title of the subject")
     content: str = Field(description="Comprehensive summary of the subject matter, 100-150 words")
-    key_metrics: List[str] = Field(description="Bullet points of specific numbers/data found")
+    key_metrics: list[str] = Field(description="Bullet points of specific numbers/data found")

@@ -47,7 +47,7 @@ Since this agent runs on the cloud, you need keys for the inference engine and t
 
 1.  **Clone the Repository**
     ```bash
-    git clone [https://github.com/levilevente/GalacticView-agent.git](https://github.com/levilevente/GalacticView-agent.git)
+    git clone https://github.com/levilevente/GalacticView-agent.git
     cd GalacticView-agent
     ```
 
