@@ -1,4 +1,4 @@
-from galacticview_bot import app
+from galacticview_bot import app, sys_msg
 from .dto import ChatTypeIn, ChatTypeOut
 
 from langchain_core.messages import SystemMessage, HumanMessage
@@ -10,10 +10,6 @@ def chat_ask_question(chat_input: ChatTypeIn) -> ChatTypeOut:
     Function to ask a question to the agent and get a response.
     """
     question = chat_input.question
-
-    sys_msg = SystemMessage(
-        content="You are a friendly and knowledgeable space enthusiast. Provide detailed and accurate information about space-related topics, including key metrics where applicable."
-    )
 
     inputs = {"messages": [sys_msg, HumanMessage(content=question)]}
 
@@ -28,7 +24,7 @@ def chat_ask_question(chat_input: ChatTypeIn) -> ChatTypeOut:
 
         config = {
             "configurable": {"thread_id": thread_id},
-            "recursion_limit": 50 
+            "recursion_limit": 50
         }
 
         for event in app.stream(inputs, config=config):  # type: ignore
@@ -39,6 +35,6 @@ def chat_ask_question(chat_input: ChatTypeIn) -> ChatTypeOut:
                     return response_data
                     
     except Exception as e:
-        return ChatTypeOut(title="Error", content=str(e), key_metrics=[])  
+        return ChatTypeOut(title="Error", content="Error occurred while processing the request.", key_metrics=[])  
     
     return response_data
