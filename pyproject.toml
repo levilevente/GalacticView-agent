@@ -21,7 +21,7 @@ dependencies = [
 ]
 
 [project.scripts]
-# Optional console script to run the CLI: `poetry run galacticview`
+# Optional console script to run the CLI: `poetry run galacticview_cli`
 galacticview_cli = "cli:main"
 
 

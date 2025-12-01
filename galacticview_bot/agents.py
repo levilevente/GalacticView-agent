@@ -67,6 +67,7 @@ def custom_tool_node(state: AgentState) -> AgentState:
                     logger.info(f"Tool returned data (Length: {len(str(raw_output))})")
                     clean_content = json.dumps(raw_output) if isinstance(raw_output, (dict, list)) else str(raw_output) 
             except Exception as e:
+                logger.exception(f"Error executing tool {tool_name}: {e}")
                 clean_content = f"Error executing tool {tool_name}: {e}"
         else:
             logger.error(f"Tool {tool_name} not found.")
