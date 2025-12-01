@@ -16,7 +16,7 @@ def search_internet_for_text(query: str) -> str:
             summary = " ".join([result.get("body", "") for result in results])
             return summary
     except Exception as e:
-        logger.exception(f"Error searching for text: {e}")
+        logger.exception("Error searching for text")
         return "Error searching for text. Please try again."
 
 
@@ -32,5 +32,5 @@ def search_internet_for_images(query: str) -> list[dict[str, str]]:
             return []
         return results
     except Exception as e:
-        logger.exception(f"Error searching for images: {e}")
+        logger.exception("Error searching for images")
         return []
