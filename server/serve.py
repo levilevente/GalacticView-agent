@@ -18,7 +18,7 @@ limiter = Limiter(key_func=get_remote_address)
 app = FastAPI()
 
 app.state.limiter = limiter
-app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler) # type: ignore
 
 app.add_middleware(
     CORSMiddleware,
@@ -44,7 +44,7 @@ def main() -> None:
     Main function to run the FastAPI app using Uvicorn.
     """
     env = os.getenv("ENVIRONMENT", "prod")
-    
+
     reload = env == "dev"
     host = "127.0.0.1"
     if env == "prod":
