@@ -21,5 +21,4 @@ if os.getenv("TAVILY_API_KEY"):
         description="Search the internet for space-related information and return relevant results.",
     )
 else:
-    if __name__ == "__main__":
-        logger.warning("TAVILY_API_KEY not set. Tavily search tool will be disabled.")
+    logger.warning("TAVILY_API_KEY not set. Tavily search tool will be disabled.")
