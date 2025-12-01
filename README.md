@@ -51,7 +51,7 @@ Before running the agent, ensure you have the necessary tools and API keys.
 
 1.  **Clone the Repository**
     ```bash
-    git clone [https://github.com/levilevente/GalacticView-agent.git](https://github.com/levilevente/GalacticView-agent.git)
+    git clone https://github.com/levilevente/GalacticView-agent.git
     cd GalacticView-agent
     ```
 
