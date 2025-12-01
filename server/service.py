@@ -1,11 +1,11 @@
-from galacticview_bot import AgentApp
+from galacticview_bot import app
 from .dto import ChatTypeIn, ChatTypeOut
 
 from langchain_core.messages import SystemMessage, HumanMessage
 
 import json
 
-def chat_ask_question(chat_input: ChatTypeIn):
+def chat_ask_question(chat_input: ChatTypeIn) -> ChatTypeOut:
     """
     Function to ask a question to the agent and get a response.
     """
@@ -31,7 +31,7 @@ def chat_ask_question(chat_input: ChatTypeIn):
             "recursion_limit": 50 
         }
 
-        for event in AgentApp.stream(inputs, config=config):  # type: ignore
+        for event in app.stream(inputs, config=config):  # type: ignore
             for key, value in event.items():
                 if key == "formatter":
                     raw_json = value["messages"][0].content
@@ -39,4 +39,6 @@ def chat_ask_question(chat_input: ChatTypeIn):
                     return response_data
                     
     except Exception as e:
-        return {"error": str(e)}  
+        return ChatTypeOut(title="Error", content=str(e), key_metrics=[])  
+    
+    return response_data

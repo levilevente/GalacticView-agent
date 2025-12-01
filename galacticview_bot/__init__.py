@@ -1,4 +1,4 @@
-from .agents import app as AgentApp
+from .agents import app as app
 
 import os
 import sys
