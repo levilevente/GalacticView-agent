@@ -100,8 +100,8 @@ Receives a user question and returns the structured agent response.
 #### Request
 ```JSON
 {
-  "question": "How many starts are aproximately between earth and moon?",
-  "datetime": "2025-12-01"
+    "question": "How many stars are approximately between earth and moon?",
+    "datetime": "2025-12-01"
 }
 ```
 
