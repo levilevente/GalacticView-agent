@@ -10,6 +10,8 @@ from .model import llm
 from .search import tavily_search_tool
 from .response_structure import SpaceResponseStructure
 
+from loguru import logger
+
 tools = [tavily_search_tool]
 
 llm_with_tools = llm.bind_tools(tools)
@@ -29,7 +31,8 @@ def custom_tool_node(state: AgentState) -> AgentState:
 
     Output: It returns a ToolMessage containing the raw text found on the internet.
     """
-
+    
+    logger.info("Entering Custom Tool Node")
     message = state["messages"]
     last_message = message[-1]
 
@@ -47,7 +50,7 @@ def custom_tool_node(state: AgentState) -> AgentState:
         tool_args = tool_call['args']
         tool_call_id = tool_call['id']
 
-        print(f"Executing Custom Tool: {tool_name} with args: {tool_args}")
+        logger.info(f"Executing Custom Tool: {tool_name} with args: {tool_args}")
 
         if tool_name in tool_map:
             
@@ -58,15 +61,15 @@ def custom_tool_node(state: AgentState) -> AgentState:
                 raw_output = chosen_tool.invoke(tool_args)
 
                 if not raw_output:
-                    print(f"WARNING: Tool returned EMPTY result for query: {tool_args.get('query')}")
+                    logger.warning(f"Tool returned EMPTY result for query: {tool_args.get('query')}")
                     clean_content = "Search returned no results. Try a broader query without filters."
                 else:
-                    print(f"Tool returned data (Length: {len(str(raw_output))})")
+                    logger.info(f"Tool returned data (Length: {len(str(raw_output))})")
                     clean_content = json.dumps(raw_output) if isinstance(raw_output, (dict, list)) else str(raw_output) 
             except Exception as e:
                 clean_content = f"Error executing tool {tool_name}: {e}"
         else:
-            print(f"Tool {tool_name} not found.")
+            logger.error(f"Tool {tool_name} not found.")
             clean_content = f"Error: Tool {tool_name} not found."
         
         results.append(ToolMessage(
@@ -90,6 +93,8 @@ def reasoner(state: AgentState) -> AgentState:
     Output: It returns an AIMessage. This message might contain text
             ("Here is the answer...") OR it might contain a tool_calls request.
     """
+
+    logger.info("Entering Reasoner Node")
     messages = state["messages"]
 
     response = llm_with_tools.invoke(messages)
@@ -106,6 +111,8 @@ def formatter(state: AgentState) -> AgentState:
 
     Output: A clean JSON string.
     """
+
+    logger.info("Entering Formatter Node")
     messages = state["messages"]
     
     # a specific system prompt for the formatting step
@@ -127,6 +134,8 @@ def should_continue(state: AgentState) -> str:
     """
     Conditional logic: If tool calls exist, go to tools. Else, format output.
     """
+
+    logger.info("Evaluating should_continue condition")
     messages = state["messages"]
     last_message = messages[-1]
 
@@ -138,7 +147,7 @@ def should_continue(state: AgentState) -> str:
     ai_moves = len([m for m in messages if m.type == "ai"])
 
     if ai_moves >= 5:
-        print("STOP: Maximum reasoning steps reached. Forcing format.")
+        logger.warning("Maximum reasoning steps reached. Forcing format.")
         return "formatter"
     
     return "tools"
