@@ -14,11 +14,12 @@ def setup_logging() -> None:
     try:
         logger.remove()
     except ValueError:
+        # Ignore if there are no handlers to remove; this is expected on first setup.
         pass
-      
+    
     logger.add(
-      level=log_level,
       sink=sys.stdout, 
+      level=log_level,
       format="<green>{time:YYYY-MM-DD HH:mm:ss}</green> | <level>{level: <8}</level> | <cyan>{name}</cyan>:<cyan>{function}</cyan>:<cyan>{line}</cyan> - <level>{message}</level>"
     )
 
