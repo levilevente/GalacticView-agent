@@ -1,12 +1,13 @@
 from langchain_core.tools import tool
 from ddgs import DDGS
 
+from loguru import logger
 
 @tool
 def search_internet_for_text(query: str) -> str:
     """Searches the internet for real-time information."""
 
-    print(f"Searching text for: {query}")
+    logger.info(f"Searching text for: {query}")
     try:
         with DDGS() as ddgs:
             results = ddgs.text(query, max_results=5)
@@ -14,8 +15,8 @@ def search_internet_for_text(query: str) -> str:
                 return "No text results found."
             summary = " ".join([result.get("body", "") for result in results])
             return summary
-    except Exception as e:
-        print(f"[DEBUG] Error detail: {e}")
+    except Exception:
+        logger.exception("Error searching for text")
         return "Error searching for text. Please try again."
 
 
@@ -23,13 +24,13 @@ def search_internet_for_text(query: str) -> str:
 def search_internet_for_images(query: str) -> list[dict[str, str]]:
     """Searches the internet for images. Returns a list of image URLs."""
 
-    print(f"Searching images for: {query}")
+    logger.info(f"Searching images for: {query}")
     try:
         with DDGS() as ddgs:
             results = ddgs.images(query, max_results=4)
         if not results:
             return []
         return results
-    except Exception as e:
-        print(f"[DEBUG] Error detail: {e}")
+    except Exception:
+        logger.exception("Error searching for images")
         return []

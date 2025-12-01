@@ -17,11 +17,12 @@ dependencies = [
     "langchain-tavily (>=0.2.13,<0.3.0)",
     "tavily-python (>=0.7.13,<0.8.0)",
     "langchain-groq (>=1.1.0,<2.0.0)",
+    "loguru (>=0.7.3,<0.8.0)",
 ]
 
 [project.scripts]
-# Optional console script to run the CLI: `poetry run galacticview`
-galacticview = "galacticview_bot.cli:main"
+# Optional console script to run the CLI: `poetry run galacticview_cli`
+galacticview_cli = "cli:main"
 
 
 [build-system]

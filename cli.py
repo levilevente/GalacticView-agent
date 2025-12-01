@@ -2,7 +2,9 @@ import json
 
 from langchain_core.messages import SystemMessage, HumanMessage
 
-from .agents import app
+from galacticview_bot.agents import app
+
+from loguru import logger
 
 def main() -> int:
     print("Aerospace Agent Online (Tavily + LangGraph)")
@@ -37,7 +39,7 @@ def main() -> int:
                     print("\nFINAL OUTPUT:")
                     print(json.dumps(data, indent=2))
     except Exception as e:
-        print(f"Error while running agent: {e}")
+        logger.error(f"Error while running agent: {e}")
         return 1
 
     return 0

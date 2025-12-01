@@ -5,12 +5,15 @@ from langchain_ollama import ChatOllama
 from langchain_groq import ChatGroq
 from langchain_core.language_models import BaseChatModel 
 
+from loguru import logger
+
 
 load_dotenv()
 
 llm: BaseChatModel
 
 if os.getenv("LLM_LOCAL", "True").lower() == "true":
+    logger.info("Using local Ollama LLM.")
     MODEL_NAME = os.getenv("MODEL_NAME", "llama3.1")
     llm = ChatOllama(
         model=MODEL_NAME,
@@ -19,6 +22,7 @@ if os.getenv("LLM_LOCAL", "True").lower() == "true":
         num_ctx=8192
     )
 else:
+    logger.info("Using Groq LLM.")
     llm = ChatGroq(
         model="llama-3.1-8b-instant", 
         temperature=0
