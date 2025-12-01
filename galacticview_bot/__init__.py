@@ -1,9 +1,10 @@
 import os
 import sys
+from typing import Any
 from dotenv import load_dotenv
 from loguru import logger
 
-def setup_logging():
+def setup_logging() -> Any:
     """
     Configures the global Loguru logger based on environment variables.
     """
