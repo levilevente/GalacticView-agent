@@ -1,7 +1,6 @@
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from slowapi import Limiter, _rate_limit_exceeded_handler
-from slowapi.util import get_remote_address
 from slowapi.errors import RateLimitExceeded
 import uvicorn
 
@@ -11,8 +10,18 @@ from .service import chat_ask_question
 
 from .dto import ChatTypeIn, ChatTypeOut
 
-# get_remote_address uses the user's IP to track usage
-limiter = Limiter(key_func=get_remote_address)
+def get_real_ip(request: Request) -> str:
+    """
+    Extract the real client IP address from the X-Forwarded-For header if present.
+    WARNING: Only trust this header if set by a trusted proxy to prevent IP spoofing.
+    """
+    forwarded = request.headers.get("X-Forwarded-For")
+    if forwarded:
+        # take the first IP in the list (the original client)
+        return forwarded.split(",")[0].strip()
+    return request.client.host # type: ignore
+
+limiter = Limiter(key_func=get_real_ip)
 
 
 app = FastAPI()

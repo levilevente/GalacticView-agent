@@ -13,6 +13,7 @@ class ChatTypeIn(BaseModel):
     def sanitize_question(cls, v: str) -> str:
         v = v.strip()
         
+        # Remove HTML tags if any
         v = re.sub('<[^<]+?>', '', v)
         
         if not v:

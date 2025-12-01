@@ -16,12 +16,6 @@ def chat_ask_question(chat_input: ChatTypeIn) -> ChatTypeOut:
 
     inputs = {"messages": [sys_msg, HumanMessage(content=question)]}
 
-    response_data: ChatTypeOut = ChatTypeOut(
-        title="",
-        content="",
-        key_metrics=[]
-    )
-
     try:
         thread_id = f"aerospace-agent-thread-{uuid.uuid4()}"
 
@@ -33,9 +27,9 @@ def chat_ask_question(chat_input: ChatTypeIn) -> ChatTypeOut:
         for event in app.stream(inputs, config=config):  # type: ignore
             for key, value in event.items():
                 if key == "formatter":
-                    raw_json = value["messages"][0].content
+                    json_str = value["messages"][0].content
                     try:
-                        response_data = ChatTypeOut(**json.loads(raw_json))
+                        response_data = ChatTypeOut(**json.loads(json_str))
                         return response_data
                     except json.JSONDecodeError:
                         return ChatTypeOut(title="Error", content="Malformed JSON received from formatter node.", key_metrics=[])
@@ -44,6 +38,5 @@ def chat_ask_question(chat_input: ChatTypeIn) -> ChatTypeOut:
         logger.exception(f"Error occurred while processing the chat question. More details: {e}")
         return ChatTypeOut(title="Error", content="Error occurred while processing the request.", key_metrics=[])  
     
-    response_data.title = "No Response"
-    response_data.content = "The agent did not return any response."
-    return response_data
+    return ChatTypeOut(title="Error", content="No response generated from the agent.", key_metrics=[])
+
