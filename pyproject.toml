@@ -22,7 +22,7 @@ dependencies = [
 
 [project.scripts]
 # Optional console script to run the CLI: `poetry run galacticview`
-galacticview = "galacticview_bot.cli:main"
+galacticview_cli = "cli:main"
 
 
 [build-system]
