@@ -23,8 +23,8 @@ dependencies = [
 
 [project.scripts]
 # Optional console script to run the CLI: `poetry run galacticview_cli`
-galacticview_cli = "cli:main"
-galacticview_app = "main:app"
+galacticview_cli = "galacticview_bot.cli:main"
+galacticview_app = "server.serve:main"
 
 [build-system]
 requires = ["poetry-core>=2.0.0,<3.0.0"]
