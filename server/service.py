@@ -1,7 +1,7 @@
 from galacticview_bot import app, sys_msg
 from .dto import ChatTypeIn, ChatTypeOut
 
-from langchain_core.messages import SystemMessage, HumanMessage
+from langchain_core.messages import HumanMessage
 
 import json
 
@@ -34,7 +34,7 @@ def chat_ask_question(chat_input: ChatTypeIn) -> ChatTypeOut:
                     response_data = ChatTypeOut(**json.loads(raw_json))
                     return response_data
                     
-    except Exception as e:
+    except Exception:
         return ChatTypeOut(title="Error", content="Error occurred while processing the request.", key_metrics=[])  
     
     return response_data
