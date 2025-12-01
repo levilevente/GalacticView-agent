@@ -18,12 +18,14 @@ dependencies = [
     "tavily-python (>=0.7.13,<0.8.0)",
     "langchain-groq (>=1.1.0,<2.0.0)",
     "loguru (>=0.7.3,<0.8.0)",
+    "fastapi[standard] (>=0.123.0,<0.124.0)",
+    "slowapi (>=0.1.9,<0.2.0)",
 ]
 
 [project.scripts]
 # Optional console script to run the CLI: `poetry run galacticview_cli`
-galacticview_cli = "cli:main"
-
+galacticview_cli = "galacticview_bot.cli:main"
+galacticview_app = "server.serve:main"
 
 [build-system]
 requires = ["poetry-core>=2.0.0,<3.0.0"]

@@ -2,6 +2,7 @@
 
 ![Python](https://img.shields.io/badge/Python-3.12%2B-blue?style=for-the-badge&logo=python&logoColor=white)
 ![Poetry](https://img.shields.io/badge/Poetry-Package%20Manager-blueviolet?style=for-the-badge&logo=poetry&logoColor=white)
+![FastAPI](https://img.shields.io/badge/FastAPI-005571?style=for-the-badge&logo=fastapi)
 ![Groq](https://img.shields.io/badge/Groq-Fast%20Inference-f55036?style=for-the-badge)
 ![LangGraph](https://img.shields.io/badge/LangGraph-Agent%20Orchestration-1c2c4c?style=for-the-badge)
 ![Tavily](https://img.shields.io/badge/Tavily-Search%20Tool-000000?style=for-the-badge)
@@ -12,13 +13,18 @@
 
 ## 📖 Overview
 
-This repository houses the intelligent backend for the [GalacticView](https://github.com/levilevente/GalacticView) ecosystem. 
+This repository houses the intelligent backend for the [GalacticView](https://github.com/levilevente/GalacticView) ecosystem.
 
-Unlike standard chatbots, this agent is built using **LangGraph**, allowing it to perform complex reasoning loops. It leverages **Groq** for ultra-fast Llama 3.1 inference and utilizes **Tavily** to search the internet for real-time astronomical data and news, ensuring answers are not limited to the model's training cutoff.
+It provides two modes of interaction:
+1.  **CLI Tool:** For testing and direct interaction in the terminal.
+2.  **REST API Server:** A backend service that exposes the agent to the frontend application.
+
+The core agent logic is encapsulated in the `galacticview_bot` package, leveraging **LangGraph** for reasoning loops and **Groq** for high-speed inference.
 
 ### 🛠 Tech Stack
 
 * **Language:** Python
+* **Web Framework:** FastAPI (Server)
 * **Orchestration:** LangGraph (LangChain)
 * **Inference Engine:** Groq API
 * **Model:** Llama 3.1 (via Groq)
@@ -36,14 +42,12 @@ Before running the agent, ensure you have the necessary tools and API keys.
 * **Poetry:** [Installation Guide](https://python-poetry.org/docs/#installation).
 
 ### 2. Obtain API Keys
-Since this agent runs on the cloud, you need keys for the inference engine and the search tool:
-
-* **Groq API Key:** Sign up at [console.groq.com](https://console.groq.com) to use Llama 3.1.
-* **Tavily API Key:** Sign up at [tavily.com](https://tavily.com) to enable internet search capabilities.
+* **Groq API Key:** Sign up at [console.groq.com](https://console.groq.com).
+* **Tavily API Key:** Sign up at [tavily.com](https://tavily.com).
 
 ---
 
-## 🚀 Installation & Usage
+## 🚀 Installation & Configuration
 
 1.  **Clone the Repository**
     ```bash
@@ -63,56 +67,68 @@ Since this agent runs on the cloud, you need keys for the inference engine and t
     # .env file content
     GROQ_API_KEY=gsk_your_groq_key_here
     TAVILY_API_KEY=tvly-your_tavily_key_here
-    MODEL_NAME=llama-3.1
-    LLM_LOCAL=False #LLM_LOCAL=True in case you have a local llama3.1 running.
-    ```
-
-    
-
-4.  **Run the Agent**
-    Enter the Poetry shell or run the script directly.
-    ```bash
-    # Run the main entry point
-    poetry run galacticview
+    MODEL_NAME=llama-3.1-70b-versatile
+    LLM_LOCAL=False  # Set to True if using a local Ollama instance
     ```
 
 ---
 
-## 🧪 Example Usage
+## 💻 Usage
 
-Once running, the agent can answer static questions or perform research.
+You can run the application in two ways using the scripts defined in `pyproject.toml`.
 
-**Input:**
-> "What is the latest news about the Artemis mission?"
+### Option 1: Run the CLI (Command Line Interface)
+Best for testing the agent logic directly in your terminal.
+```bash
+poetry run galacticview_cli
+```
 
-**Agent Logic:**
-1.  *LangGraph* detects the need for recent information.
-2.  Calls *Tavily* to search the web for "latest Artemis mission updates".
-3.  *Groq (Llama 3.1)* synthesizes the search results.
+### Option 2: Run the API Server
+Starts the web server (located in `server/serve.py`) to accept HTTP requests.
+```bash
+poetry run galacticview_app
+```
 
-**Agent Response:**
-```json
+## 📡 API Documentation
+
+When running the server (`poetry run galacticview_app`), the agent logic is exposed via a REST endpoint.
+
+`POST /chat`
+
+Receives a user question and returns the structured agent response.
+
+#### Request
+```JSON
 {
-  "content": "The Artemis mission has been delayed due to damage found to the heat shield of the uncrewed Orion capsule. Artemis 2 remains on track for late 2024, but Artemis 3 has been pushed back to mid-2027.",
-  "key_metrics": [
-    "Artemis 2: late 2024",
-    "Artemis 3: mid-2027"
-  ],
-  "title": "Artemis Mission Delay"
+    "question": "How many stars are approximately between earth and moon?",
+    "date": "2025-12-01"
 }
 ```
 
+#### Response
+```JSON
+{
+    "title": "Stars and the Moon",
+    "content": "There are no stars between Earth and the Moon. The closest star, Proxima Centauri, is over 4 light-years away. This means that the Moon is in the Earth's shadow and does not reflect the light of any nearby stars. The Moon's surface is illuminated by the Sun's light, which is the only star that is close enough to be visible from the Moon.",
+    "key_metrics": [
+        "4 light-years",
+        "Proxima Centauri",
+        "Earth's shadow"
+    ]
+}
+```
 
----
+## 🧠 Agent Logic
+Structure (for more details see `agents.py`):
 
-## 🔗 Integration Roadmap
+1. Input: The agent receives a query via the CLI or API.
 
-This agent is designed to connect with the **GalacticView Frontend**.
-* **Current Status:** CLI-based Agent with Search Tools.
-* **Next Steps:** Wrap the LangGraph workflow in a REST API (FastAPI) to allow the React frontend to send requests and receive streaming answers.
+2. Reasoning (LangGraph): The agent determines if it has the internal knowledge to answer or if it needs external information.
 
----
+3. Tool Usage (Tavily): If the topic requires current events (e.g., "news today"), it calls the Tavily Search API.
+
+4. Synthesis (Groq): The LLM synthesizes the search results into a structured JSON format containing a summary, title, and key metrics.
 
 ## 📄 License
 
-This project is licensed under the Apache License 2.0 - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the Apache License 2.0 - see the  [LICENSE](LICENSE)  file for details.

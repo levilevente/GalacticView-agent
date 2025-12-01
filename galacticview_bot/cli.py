@@ -1,8 +1,9 @@
 import json
 
-from langchain_core.messages import SystemMessage, HumanMessage
+from langchain_core.messages import HumanMessage
 
 from galacticview_bot.agents import app
+from .system_messages import sys_msg
 
 from loguru import logger
 
@@ -13,10 +14,6 @@ def main() -> int:
     # replace this with user input or an API endpoint.
     user_q = "What is the latest news about the Artemis mission?"
 
-    # initial System Prompt to set persona
-    sys_msg = SystemMessage(
-        content="You are a friendly and knowledgeable space enthusiast. Provide detailed and accurate information about space-related topics, including key metrics where applicable."
-        )
 
     inputs = {"messages": [sys_msg, HumanMessage(content=user_q)]}
 
