@@ -7,13 +7,6 @@ from .dto import ChatTypeIn, ChatTypeOut
 
 app = FastAPI()
 
-@app.get("/")
-def read_root() -> dict[str, str]:
-    """
-    A simple root endpoint.
-    """
-    return {"Hello": "World"}
-
 @app.post("/chat")
 def chat_endpoint(request: ChatTypeIn) -> ChatTypeOut:
     """
