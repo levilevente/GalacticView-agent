@@ -4,6 +4,7 @@ from .dto import ChatTypeIn, ChatTypeOut
 from langchain_core.messages import HumanMessage
 
 import json
+import uuid
 
 def chat_ask_question(chat_input: ChatTypeIn) -> ChatTypeOut:
     """
@@ -20,7 +21,7 @@ def chat_ask_question(chat_input: ChatTypeIn) -> ChatTypeOut:
     )
 
     try:
-        thread_id = "aerospace-agent-thread-001"
+        thread_id = f"aerospace-agent-thread-{uuid.uuid4()}"
 
         config = {
             "configurable": {"thread_id": thread_id},
