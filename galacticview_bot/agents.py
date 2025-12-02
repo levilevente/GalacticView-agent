@@ -14,7 +14,7 @@ from loguru import logger
 
 tools = [tavily_search_tool]
 
-llm_with_tools = llm.bind_tools(tools)
+llm_with_tools = llm.bind_tools(tools, tool_choice="auto")
 
 class AgentState(TypedDict):
     messages: Annotated[List[BaseMessage], add_messages]    
